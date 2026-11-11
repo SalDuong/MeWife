@@ -2,7 +2,8 @@
   "months": [
     "Oct-2026",
     "Nov-2026",
-    "Dec-2026"
+    "Dec-2026",
+    "Jan-2027"
   ],
   "data": {
     "Oct-2026": {
@@ -90,6 +91,51 @@
       "partner2Income": 0,
       "savings": [],
       "fixedExpenses": [],
+      "weeklyExpenses": [
+        {
+          "name": "Food & Groceries",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        },
+        {
+          "name": "Dining Out & Coffee",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        },
+        {
+          "name": "Transportation & Fuel",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        },
+        {
+          "name": "Miscellaneous & Sundries",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        }
+      ],
+      "receipts": []
+    },
+    "Jan-2027": {
+      "partner1Name": "Partner 1",
+      "partner1Income": 2000,
+      "partner2Name": "Partner 2",
+      "partner2Income": 0,
+      "savings": [],
+      "fixedExpenses": [
+        {
+          "name": "rent",
+          "payer": "Joint Account",
+          "amount": 250
+        }
+      ],
       "weeklyExpenses": [
         {
           "name": "Food & Groceries",
