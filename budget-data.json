@@ -1,0 +1,126 @@
+{
+  "months": [
+    "Oct-2026",
+    "Nov-2026",
+    "Dec-2026"
+  ],
+  "data": {
+    "Oct-2026": {
+      "partner1Name": "Partner 1",
+      "partner1Income": 0,
+      "partner2Name": "Partner 2",
+      "partner2Income": 0,
+      "savings": [],
+      "fixedExpenses": [],
+      "weeklyExpenses": [
+        {
+          "name": "Food & Groceries",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        },
+        {
+          "name": "Dining Out & Coffee",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        },
+        {
+          "name": "Transportation & Fuel",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        },
+        {
+          "name": "Miscellaneous & Sundries",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        }
+      ],
+      "receipts": []
+    },
+    "Nov-2026": {
+      "partner1Name": "Partner 1",
+      "partner1Income": 0,
+      "partner2Name": "Partner 2",
+      "partner2Income": 0,
+      "savings": [],
+      "fixedExpenses": [],
+      "weeklyExpenses": [
+        {
+          "name": "Food & Groceries",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        },
+        {
+          "name": "Dining Out & Coffee",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        },
+        {
+          "name": "Transportation & Fuel",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        },
+        {
+          "name": "Miscellaneous & Sundries",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        }
+      ],
+      "receipts": []
+    },
+    "Dec-2026": {
+      "partner1Name": "Partner 1",
+      "partner1Income": 0,
+      "partner2Name": "Partner 2",
+      "partner2Income": 0,
+      "savings": [],
+      "fixedExpenses": [],
+      "weeklyExpenses": [
+        {
+          "name": "Food & Groceries",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        },
+        {
+          "name": "Dining Out & Coffee",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        },
+        {
+          "name": "Transportation & Fuel",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        },
+        {
+          "name": "Miscellaneous & Sundries",
+          "w1": 0,
+          "w2": 0,
+          "w3": 0,
+          "w4": 0
+        }
+      ],
+      "receipts": []
+    }
+  }
+}
