@@ -7,7 +7,7 @@
   "data": {
     "Oct-2026": {
       "partner1Name": "Partner 1",
-      "partner1Income": 200,
+      "partner1Income": 0,
       "partner2Name": "Partner 2",
       "partner2Income": 0,
       "savings": [],
@@ -46,7 +46,7 @@
     },
     "Nov-2026": {
       "partner1Name": "Partner 1",
-      "partner1Income": 200,
+      "partner1Income": 0,
       "partner2Name": "Partner 2",
       "partner2Income": 0,
       "savings": [],
