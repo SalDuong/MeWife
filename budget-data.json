@@ -3,51 +3,71 @@
     "Oct-2026",
     "Nov-2026",
     "Dec-2026",
-    "jan-2027"
+    "Jan-2027"
   ],
   "data": {
     "Oct-2026": {
       "partner1Name": "Partner 1",
-      "partner1Income": 100,
+      "partner1Income": 780,
       "partner2Name": "Partner 2",
-      "partner2Income": 2345,
-      "savings": [],
-      "fixedExpenses": [],
+      "partner2Income": 700,
+      "savings": [
+        {
+          "name": "Gold",
+          "amount": 600
+        },
+        {
+          "name": "Emergency fund",
+          "amount": 50
+        }
+      ],
+      "fixedExpenses": [
+        {
+          "name": "Rent",
+          "payer": "Joint Account",
+          "amount": 250
+        },
+        {
+          "name": "Util",
+          "payer": "Joint Account",
+          "amount": 50
+        }
+      ],
       "weeklyExpenses": [
         {
           "name": "Food & Groceries",
           "w1": 0,
           "w2": 0,
           "w3": 0,
-          "w4": 0
+          "w4": 100
         },
         {
           "name": "Dining Out & Coffee",
           "w1": 0,
           "w2": 0,
           "w3": 0,
-          "w4": 0
+          "w4": 100
         },
         {
           "name": "Transportation & Fuel",
           "w1": 0,
           "w2": 0,
           "w3": 0,
-          "w4": 0
+          "w4": 32
         },
         {
           "name": "Miscellaneous & Sundries",
           "w1": 0,
           "w2": 0,
           "w3": 0,
-          "w4": 0
+          "w4": 150
         }
       ],
       "receipts": []
     },
     "Nov-2026": {
       "partner1Name": "Partner 1",
-      "partner1Income": 200,
+      "partner1Income": 0,
       "partner2Name": "Partner 2",
       "partner2Income": 0,
       "savings": [],
@@ -123,7 +143,7 @@
       ],
       "receipts": []
     },
-    "jan-2027": {
+    "Jan-2027": {
       "partner1Name": "Partner 1",
       "partner1Income": 0,
       "partner2Name": "Partner 2",
@@ -153,7 +173,7 @@
           "w4": 0
         },
         {
-          "name": "Miscellaneous & Sundries",
+          "name": "Misc",
           "w1": 0,
           "w2": 0,
           "w3": 0,
