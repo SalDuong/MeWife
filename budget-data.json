@@ -7,9 +7,9 @@
   ],
   "data": {
     "Oct-2026": {
-      "partner1Name": "SAL",
+      "partner1Name": "Partner 1",
       "partner1Income": 780,
-      "partner2Name": "LEAP",
+      "partner2Name": "Partner 2",
       "partner2Income": 700,
       "savings": [
         {
