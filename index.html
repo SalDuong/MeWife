@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoupleSync • Luxury Purple & Monochrome Budget Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for Interactive Dashboards -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Tesseract.js for OCR Receipt Scanner -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@v4.0.2/dist/tesseract.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        lux: {
+                            bg: '#0a0a0c',
+                            card: '#141418',
+                            border: '#27272a',
+                            purple: '#8b5cf6',
+                            lightpurple: '#c084fc',
+                            emerald: '#10b981',
+                            rose: '#f43f5e'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0a0c;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(192, 132, 252, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+        .glass-card {
+            background: rgba(20, 20, 24, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(39, 39, 42, 0.9);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 0 20px rgba(139, 92, 246, 0.04);
+        }
+        .purple-gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .purple-gradient-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%);
+        }
+        .purple-gradient-btn:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #b85eff 100%);
+        }
+        input, select {
+            background-color: #121216 !important;
+            border-color: #27272a !important;
+            color: #f4f4f5 !important;
+        }
+        input:focus, select:focus {
+            border-color: #a855f7 !important;
+            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2) !important;
+            outline: none !important;
+        }
+    </style>
+</head>
+<body class="text-zinc-100 font-sans antialiased min-h-full flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="glass-card border-b border-zinc-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+            <div class="flex items-center space-x-3 shrink-0">
+                <div class="w-10 h-10 rounded-xl purple-gradient-btn flex items-center justify-center shadow-lg shadow-purple-500/20">
+                    <i class="fa-solid fa-wallet text-zinc-950 font-bold text-lg"></i>
+                </div>
+                <div class="hidden sm:block">
+                    <h1 class="text-base font-bold tracking-tight text-white flex items-center space-x-2">
+                        <span class="purple-gradient-text">CoupleSync Budget</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/30">v4.2 Lux</span>
+                    </h1>
+                    <p class="text-xs text-zinc-400 font-mono">Monochrome & Purple Gradient Edition</p>
+                </div>
+            </div>
+
+            <!-- Month Selector & Global Actions -->
+            <div class="flex items-center space-x-2">
+                <!-- Month Management Pill -->
+                <div class="flex items-center bg-zinc-900/90 px-2.5 py-1.5 rounded-xl border border-zinc-800 space-x-1.5">
+                    <span class="text-xs font-medium text-zinc-400 hidden lg:inline"><i class="fa-regular fa-calendar-days mr-1 text-purple-400"></i>Month:</span>
+                    <select id="activeMonth" class="bg-transparent text-xs font-mono font-semibold text-purple-300 focus:outline-none cursor-pointer pr-1">
+                        <!-- Populated by JS -->
+                    </select>
+                    
+                    <div class="h-4 w-[1px] bg-zinc-800 mx-1"></div>
+
+                    <button type="button" onclick="openAddMonthModal()" class="text-zinc-400 hover:text-purple-400 p-1 transition rounded-lg hover:bg-zinc-800" title="Add New Blank Month">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                    </button>
+                    <button type="button" onclick="openRenameMonthModal()" class="text-zinc-400 hover:text-amber-400 p-1 transition rounded-lg hover:bg-zinc-800" title="Rename Active Month">
+                        <i class="fa-solid fa-pen-to-square text-xs"></i>
+                    </button>
+                    <button type="button" onclick="openDeleteMonthModal()" class="text-zinc-400 hover:text-rose-400 p-1 transition rounded-lg hover:bg-zinc-800" title="Delete Active Month">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+
+                <button type="button" onclick="exportToExcel()" class="bg-zinc-800 hover:bg-zinc-700 text-emerald-400 border border-zinc-700 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center space-x-1.5" title="Export Excel CSV">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span class="hidden md:inline">Export CSV</span>
+                </button>
+
+                <button type="button" onclick="openSettingsModal()" class="bg-zinc-800 hover:bg-zinc-700 text-purple-300 border border-zinc-700 px-3 py-2 rounded-xl text-xs font-medium transition flex items-center space-x-1.5" title="GitHub Sync Settings">
+                    <i class="fa-solid fa-gear"></i>
+                    <span class="hidden md:inline">GitHub Sync</span>
+                </button>
+
+                <button type="button" onclick="syncToGitHub()" id="syncBtn" class="purple-gradient-btn text-zinc-950 font-bold px-3.5 py-2 rounded-xl text-xs transition shadow-lg shadow-purple-500/20 flex items-center space-x-1.5">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span class="hidden sm:inline">Sync Now</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="bg-zinc-950/60 border-b border-zinc-800 backdrop-blur-md overflow-x-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-6 min-w-max">
+            <button type="button" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="py-3 px-1 border-b-2 font-medium text-sm transition border-purple-400 text-purple-300 flex items-center space-x-2">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard & KPIs</span>
+            </button>
+            <button type="button" onclick="switchTab('income')" id="tab-btn-income" class="py-3 px-1 border-b-2 font-medium text-sm transition border-transparent text-zinc-400 hover:text-zinc-200 flex items-center space-x-2">
+                <i class="fa-solid fa-sack-dollar"></i>
+                <span>Income & Savings</span>
+            </button>
+            <button type="button" onclick="switchTab('fixed')" id="tab-btn-fixed" class="py-3 px-1 border-b-2 font-medium text-sm transition border-transparent text-zinc-400 hover:text-zinc-200 flex items-center space-x-2">
+                <i class="fa-solid fa-house-chimney"></i>
+                <span>Fixed Monthly Expenses</span>
+            </button>
+            <button type="button" onclick="switchTab('weekly')" id="tab-btn-weekly" class="py-3 px-1 border-b-2 font-medium text-sm transition border-transparent text-zinc-400 hover:text-zinc-200 flex items-center space-x-2">
+                <i class="fa-solid fa-calendar-week"></i>
+                <span>Weekly Variable Spend</span>
+            </button>
+            <button type="button" onclick="switchTab('receipts')" id="tab-btn-receipts" class="py-3 px-1 border-b-2 font-medium text-sm transition border-transparent text-zinc-400 hover:text-zinc-200 flex items-center space-x-2">
+                <i class="fa-solid fa-receipt"></i>
+                <span>Batch Receipt OCR Vault</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- App Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- NOTIFICATION TOAST -->
+        <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 glass-card text-zinc-100 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 border-purple-500/40">
+            <div id="toast-icon" class="text-purple-400 text-lg"><i class="fa-solid fa-circle-check"></i></div>
+            <div id="toast-msg" class="text-sm font-medium">Changes saved successfully!</div>
+        </div>
+
+        <!-- ADD MONTH MODAL -->
+        <div id="addMonthModal" class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm hidden">
+            <div class="glass-card rounded-2xl p-6 w-full max-w-md space-y-5 border-purple-500/30">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <h3 class="text-base font-bold text-white"><i class="fa-regular fa-calendar-plus text-purple-400 mr-2"></i>Create Blank New Month</h3>
+                    <button type="button" onclick="closeAddMonthModal()" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-1">Month Identifier (e.g. Jan-2027)</label>
+                        <input type="text" id="newMonthInput" placeholder="Jan-2027" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm font-mono text-purple-300 focus:outline-none">
+                        <p class="text-[11px] text-zinc-500 mt-1.5">Note: Initializes completely clean with zero default values.</p>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeAddMonthModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 text-zinc-300 hover:bg-zinc-700">Cancel</button>
+                    <button type="button" onclick="confirmAddMonth()" class="px-4 py-2 rounded-xl text-xs font-bold purple-gradient-btn text-zinc-950 shadow-lg shadow-purple-500/25">Create Blank Month</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RENAME MONTH MODAL -->
+        <div id="renameMonthModal" class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm hidden">
+            <div class="glass-card rounded-2xl p-6 w-full max-w-md space-y-5 border-amber-500/30">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <h3 class="text-base font-bold text-white"><i class="fa-solid fa-pen-to-square text-amber-400 mr-2"></i>Rename Active Month</h3>
+                    <button type="button" onclick="closeRenameMonthModal()" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-1">Current Identifier: <span id="renameCurrentLabel" class="font-mono text-purple-300"></span></label>
+                        <input type="text" id="renameMonthInput" placeholder="Enter new name (e.g. Jan-2027)" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm font-mono text-amber-300 focus:outline-none">
+                        <p class="text-[11px] text-zinc-500 mt-1.5">All financial entries and receipts for this sheet will be preserved under the new name.</p>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeRenameMonthModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 text-zinc-300 hover:bg-zinc-700">Cancel</button>
+                    <button type="button" onclick="confirmRenameMonth()" class="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-zinc-950 shadow-lg shadow-amber-500/20">Save New Name</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DELETE MONTH CONFIRMATION MODAL -->
+        <div id="deleteMonthModal" class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm hidden">
+            <div class="glass-card rounded-2xl p-6 w-full max-w-md space-y-5 border-rose-500/40">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <h3 class="text-base font-bold text-white"><i class="fa-solid fa-triangle-exclamation text-rose-400 mr-2"></i>Delete Month Sheet</h3>
+                    <button type="button" onclick="closeDeleteMonthModal()" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <div class="space-y-3">
+                    <p class="text-sm text-zinc-300">Are you sure you want to permanently delete <strong id="deleteTargetLabel" class="font-mono text-rose-400"></strong>?</p>
+                    <p class="text-xs text-zinc-400 bg-rose-950/20 border border-rose-900/40 p-3 rounded-xl">This will remove all income, savings, fixed/weekly expenses, and uploaded receipt photos stored in this month sheet.</p>
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeDeleteMonthModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 text-zinc-300 hover:bg-zinc-700">Cancel</button>
+                    <button type="button" onclick="confirmDeleteMonth()" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-500/20">Delete Permanently</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- GITHUB SETTINGS MODAL -->
+        <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/80 backdrop-blur-sm hidden">
+            <div class="glass-card rounded-2xl p-6 w-full max-w-md space-y-5 border-purple-500/30">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                    <h3 class="text-base font-bold text-white"><i class="fa-solid fa-cloud-arrow-up text-purple-400 mr-2"></i>GitHub JSON Cloud Sync Setup</h3>
+                    <button type="button" onclick="closeSettingsModal()" class="text-zinc-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <div class="space-y-4">
+                    <p class="text-xs text-zinc-400">Configure your private GitHub repository credentials so your web app can automatically read and write your JSON data store.</p>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-1">GitHub Username</label>
+                        <input type="text" id="ghUser" placeholder="e.g. pisalduong" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-1">Repository Name</label>
+                        <input type="text" id="ghRepo" placeholder="e.g. couple-budget" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-300 mb-1">Personal Access Token (PAT)</label>
+                        <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm font-mono text-zinc-100 focus:outline-none">
+                        <p class="text-[11px] text-zinc-500 mt-1">Requires repo scope permission.</p>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 text-zinc-300 hover:bg-zinc-700">Cancel</button>
+                    <button type="button" onclick="saveSettings()" class="px-4 py-2 rounded-xl text-xs font-bold purple-gradient-btn text-zinc-950 shadow-lg shadow-purple-500/25">Save & Sync</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 1: DASHBOARD & KPIS -->
+        <div id="tab-dashboard" class="space-y-8">
+            
+            <!-- KPI Scorecards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <!-- Total Income -->
+                <div class="glass-card rounded-2xl p-5 shadow-lg relative overflow-hidden group hover:border-purple-500/50 transition">
+                    <div class="absolute right-4 top-4 w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+                        <i class="fa-solid fa-arrow-trend-up text-lg"></i>
+                    </div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-zinc-400 font-mono">Total Income</p>
+                    <h3 id="kpi-income" class="text-2xl font-bold font-mono text-emerald-400 mt-2">$0.00</h3>
+                    <p class="text-xs text-zinc-400 mt-1"><span class="text-emerald-400 font-medium">Active Period</span></p>
+                </div>
+
+                <!-- Total Outflows (Fixed + Weekly) -->
+                <div class="glass-card rounded-2xl p-5 shadow-lg relative overflow-hidden group hover:border-rose-500/50 transition border-rose-950/50">
+                    <div class="absolute right-4 top-4 w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400 border border-rose-500/20">
+                        <i class="fa-solid fa-arrow-trend-down text-lg"></i>
+                    </div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-rose-300 font-mono">Total Expenses</p>
+                    <h3 id="kpi-expenses" class="text-2xl font-bold font-mono text-rose-400 mt-2">$0.00</h3>
+                    <p class="text-xs text-zinc-400 mt-1">Fixed + Variable Spend</p>
+                </div>
+
+                <!-- Total Savings Allocated -->
+                <div class="glass-card rounded-2xl p-5 shadow-lg relative overflow-hidden group hover:border-purple-500/50 transition">
+                    <div class="absolute right-4 top-4 w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20">
+                        <i class="fa-solid fa-piggy-bank text-lg"></i>
+                    </div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-zinc-400 font-mono">Total Savings</p>
+                    <h3 id="kpi-savings" class="text-2xl font-bold font-mono text-purple-400 mt-2">$0.00</h3>
+                    <p class="text-xs text-zinc-400 mt-1">Savings Rate: <span id="kpi-savings-rate" class="font-medium text-purple-300 font-mono">0%</span></p>
+                </div>
+
+                <!-- Net Remaining Balance -->
+                <div class="glass-card rounded-2xl p-5 shadow-lg relative overflow-hidden group hover:border-purple-500/50 transition">
+                    <div class="absolute right-4 top-4 w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20">
+                        <i class="fa-solid fa-scale-balanced text-lg"></i>
+                    </div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-zinc-400 font-mono">Net Remaining</p>
+                    <h3 id="kpi-net" class="text-2xl font-bold font-mono text-purple-300 mt-2">$0.00</h3>
+                    <p class="text-xs text-zinc-400 mt-1">Unallocated Cash Flow</p>
+                </div>
+            </div>
+
+            <!-- Advanced Metrics Bar -->
+            <div class="glass-card rounded-2xl p-6 shadow-lg grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="flex items-center space-x-4 border-b md:border-b-0 md:border-r border-zinc-800 pb-4 md:pb-0">
+                    <div class="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400 font-bold text-lg border border-rose-500/20">
+                        <i class="fa-solid fa-percent"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-400 font-mono">Expense-to-Income Ratio</p>
+                        <h4 id="metric-expense-ratio" class="text-xl font-bold font-mono text-rose-400">0.0%</h4>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4 border-b md:border-b-0 md:border-r border-zinc-800 pb-4 md:pb-0">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 font-bold text-lg border border-amber-500/20">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-400 font-mono">Weekly Burn Rate (Avg)</p>
+                        <h4 id="metric-weekly-burn" class="text-xl font-bold font-mono text-amber-400">$0.00</h4>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 font-bold text-lg border border-purple-500/20">
+                        <i class="fa-solid fa-vault"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-zinc-400 font-mono">Target Savings Status</p>
+                        <h4 id="metric-savings-status" class="text-xl font-bold font-mono text-purple-300">On Track</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Donut Chart: Budget Allocation -->
+                <div class="glass-card rounded-2xl p-6 shadow-lg flex flex-col">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-chart-pie text-purple-400"></i>
+                            <span>Cash Flow Allocation Breakdown</span>
+                        </h3>
+                        <span class="text-xs font-mono text-zinc-400">Active Month</span>
+                    </div>
+                    <div class="relative flex-1 flex items-center justify-center min-h-[280px]">
+                        <canvas id="budgetDonutChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bar Chart: Multi-Month Comparison -->
+                <div class="glass-card rounded-2xl p-6 shadow-lg flex flex-col">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-chart-column text-purple-400"></i>
+                            <span>Multi-Month Financial Trend</span>
+                        </h3>
+                        <span class="text-xs font-mono text-zinc-400">Comparative Timeline</span>
+                    </div>
+                    <div class="relative flex-1 flex items-center justify-center min-h-[280px]">
+                        <canvas id="trendBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Multi-Month Summary Matrix Table -->
+            <div class="glass-card rounded-2xl shadow-lg overflow-hidden">
+                <div class="px-6 py-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/50">
+                    <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-table-cells text-purple-400"></i>
+                        <span>Dynamic Multi-Month Comparative Matrix</span>
+                    </h3>
+                    <span class="text-xs font-mono bg-purple-500/10 text-purple-300 font-semibold px-3 py-1 rounded-full border border-purple-500/30">Live Consolidated</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead id="multiMonthTableHead"></thead>
+                        <tbody id="multiMonthTableBody" class="divide-y divide-zinc-800 text-zinc-300"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TAB 2: INCOME & SAVINGS -->
+        <div id="tab-income" class="space-y-8 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Couple Earnings Card -->
+                <div class="glass-card rounded-2xl p-6 shadow-lg space-y-6">
+                    <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+                        <div>
+                            <h2 class="text-base font-bold text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-sack-dollar text-emerald-400"></i>
+                                <span>Monthly Combined Income</span>
+                            </h2>
+                            <p class="text-xs text-zinc-400">Net earnings for both partners.</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-zinc-400 font-mono">Total Income</span>
+                            <div id="displayTotalIncome" class="text-lg font-bold font-mono text-emerald-400">$0.00</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-300 mb-1 font-mono">Partner 1 Name</label>
+                            <input type="text" id="partner1Name" value="Partner 1" oninput="calculateAll()" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-300 mb-1 font-mono">Partner 1 Earning ($)</label>
+                            <input type="number" id="partner1Income" value="0" oninput="calculateAll()" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm font-mono text-emerald-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-300 mb-1 font-mono">Partner 2 Name</label>
+                            <input type="text" id="partner2Name" value="Partner 2" oninput="calculateAll()" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-zinc-100 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-300 mb-1 font-mono">Partner 2 Earning ($)</label>
+                            <input type="number" id="partner2Income" value="0" oninput="calculateAll()" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm font-mono text-emerald-400 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Savings & Investment Allocation -->
+                <div class="glass-card rounded-2xl p-6 shadow-lg space-y-6">
+                    <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+                        <div>
+                            <h2 class="text-base font-bold text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-piggy-bank text-purple-400"></i>
+                                <span>Savings & Investments</span>
+                            </h2>
+                            <p class="text-xs text-zinc-400">Automated deductions from earnings.</p>
+                        </div>
+                        <button type="button" onclick="addSavingsRow()" class="bg-purple-500/25 hover:bg-purple-500/35 text-purple-200 border border-purple-500/40 px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 shadow-md">
+                            <i class="fa-solid fa-plus text-purple-300"></i>
+                            <span>Add Goal</span>
+                        </button>
+                    </div>
+
+                    <div id="savingsRowsContainer" class="space-y-3"></div>
+
+                    <div class="bg-zinc-900/80 p-4 rounded-xl border border-zinc-800 flex items-center justify-between">
+                        <span class="text-sm font-medium text-zinc-300">Total Savings Allocated:</span>
+                        <span id="displayTotalSavings" class="text-base font-bold font-mono text-purple-400">$0.00</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB 3: FIXED MONTHLY EXPENSES -->
+        <div id="tab-fixed" class="space-y-6 hidden">
+            <div class="glass-card rounded-2xl p-6 shadow-lg space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800 pb-4 gap-4">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-house-chimney text-rose-400"></i>
+                            <span>Fixed Monthly Expenses (Rent & Utilities)</span>
+                        </h2>
+                        <p class="text-xs text-zinc-400">Recurring obligations highlighted in soft red tones.</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xs text-zinc-400">Total Fixed: <strong id="displayTotalFixed" class="text-rose-400 text-sm font-mono font-bold">$0.00</strong></span>
+                        <button type="button" onclick="addFixedRow()" class="bg-rose-500/25 hover:bg-rose-500/35 text-rose-200 border border-rose-500/40 px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 shadow-md">
+                            <i class="fa-solid fa-plus text-rose-300"></i>
+                            <span>Add Expense</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-zinc-800 text-xs text-zinc-400 uppercase bg-zinc-900/60 font-mono">
+                                <th class="py-3 px-4">Description</th>
+                                <th class="py-3 px-4">Payer</th>
+                                <th class="py-3 px-4 w-48">Amount ($)</th>
+                                <th class="py-3 px-4 text-center w-20">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fixedRowsContainer" class="divide-y divide-zinc-800"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: WEEKLY VARIABLE SPEND -->
+        <div id="tab-weekly" class="space-y-6 hidden">
+            <div class="glass-card rounded-2xl p-6 shadow-lg space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800 pb-4 gap-4">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-calendar-week text-amber-400"></i>
+                            <span>Weekly Variable Spending Tracker</span>
+                        </h2>
+                        <p class="text-xs text-zinc-400">Food, transport, and leisure tracked across 4 weeks with soft red highlights.</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xs text-zinc-400">Total Variable: <strong id="displayTotalWeekly" class="text-rose-400 text-sm font-mono font-bold">$0.00</strong></span>
+                        <button type="button" onclick="addWeeklyRow()" class="bg-amber-500/25 hover:bg-amber-500/35 text-amber-200 border border-amber-500/40 px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-1.5 shadow-md">
+                            <i class="fa-solid fa-plus text-amber-300"></i>
+                            <span>Add Category</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-zinc-800 text-xs text-zinc-400 uppercase bg-zinc-900/60 font-mono">
+                                <th class="py-3 px-4">Category</th>
+                                <th class="py-3 px-4 w-28">Week 1 ($)</th>
+                                <th class="py-3 px-4 w-28">Week 2 ($)</th>
+                                <th class="py-3 px-4 w-28">Week 3 ($)</th>
+                                <th class="py-3 px-4 w-28">Week 4 ($)</th>
+                                <th class="py-3 px-4 w-32 text-right">Total</th>
+                                <th class="py-3 px-4 text-center w-16">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="weeklyRowsContainer" class="divide-y divide-zinc-800"></tbody>
+                        <tfoot>
+                            <tr class="border-t border-zinc-800 bg-zinc-900/60 font-mono text-xs text-zinc-300">
+                                <td class="py-3 px-4">Weekly Subtotals:</td>
+                                <td id="subWeek1" class="py-3 px-4 text-rose-400 font-bold">$0.00</td>
+                                <td id="subWeek2" class="py-3 px-4 text-rose-400 font-bold">$0.00</td>
+                                <td id="subWeek3" class="py-3 px-4 text-rose-400 font-bold">$0.00</td>
+                                <td id="subWeek4" class="py-3 px-4 text-rose-400 font-bold">$0.00</td>
+                                <td colspan="2" class="py-3 px-4 text-right text-rose-400 font-bold" id="grandWeeklyTotal">$0.00</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: BATCH RECEIPT VAULT & OCR SCANNER -->
+        <div id="tab-receipts" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Batch Upload & OCR Form -->
+                <div class="glass-card rounded-2xl p-6 shadow-lg space-y-5 h-fit border-purple-500/30">
+                    <div class="border-b border-zinc-800 pb-3">
+                        <h2 class="text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i>
+                            <span>Batch Multi-Receipt OCR Scanner</span>
+                        </h2>
+                        <p class="text-xs text-zinc-400">Select multiple receipt photos simultaneously. High-precision OCR extracts merchant, amount, and date.</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-zinc-300 mb-1 font-mono">Select Multiple Receipt Photos</label>
+                            <input type="file" id="batchReceiptFileInput" accept="image/*" multiple onchange="processBatchReceiptsOCR(this)" class="w-full text-xs text-zinc-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer">
+                        </div>
+
+                        <div id="ocrBatchStatus" class="hidden text-xs text-purple-300 font-mono bg-purple-500/10 p-3 rounded-xl border border-purple-500/30 flex items-center space-x-2">
+                            <i class="fa-solid fa-spinner fa-spin text-purple-400 text-sm"></i>
+                            <span id="ocrBatchStatusText">Processing receipts in batch...</span>
+                        </div>
+
+                        <div class="bg-zinc-900/70 p-4 rounded-xl border border-zinc-800/80 space-y-3">
+                            <h4 class="text-xs font-semibold text-zinc-200 uppercase tracking-wider font-mono"><i class="fa-solid fa-sliders mr-1 text-purple-400"></i>Default Allocation Settings</h4>
+                            <div>
+                                <label class="block text-[11px] font-medium text-zinc-400 mb-1">Category</label>
+                                <select id="batchDefaultCategory" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-300">
+                                    <option value="Food & Groceries">Food & Groceries</option>
+                                    <option value="Dining Out & Coffee">Dining Out & Coffee</option>
+                                    <option value="Transportation & Fuel">Transportation & Fuel</option>
+                                    <option value="Entertainment & Leisure">Entertainment & Leisure</option>
+                                    <option value="Miscellaneous & Sundries" selected>Miscellaneous & Sundries</option>
+                                    <option value="Fixed Bill / Utility">Fixed Bill / Utility</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-medium text-zinc-400 mb-1">Allocation Target</label>
+                                <select id="batchDefaultAssignment" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-300">
+                                    <option value="Week 1">Week 1 Variable</option>
+                                    <option value="Week 2">Week 2 Variable</option>
+                                    <option value="Week 3">Week 3 Variable</option>
+                                    <option value="Week 4">Week 4 Variable</option>
+                                    <option value="Whole Month Lump-Sum">Whole Month Lump-Sum</option>
+                                    <option value="Miscellaneous Vault Only" selected>Miscellaneous Vault Only</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="text-[11px] text-zinc-400 leading-relaxed bg-zinc-950/40 p-3 rounded-xl border border-zinc-800">
+                            <i class="fa-solid fa-circle-info text-purple-400 mr-1"></i> Scanned receipts can be edited directly in the vault table on the right before or after syncing.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Receipt Vault Gallery -->
+                <div class="lg:col-span-2 glass-card rounded-2xl p-6 shadow-lg space-y-5">
+                    <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                        <div>
+                            <h2 class="text-base font-bold text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-boxes-packing text-purple-400"></i>
+                                <span>Saved Photo Receipts Vault</span>
+                            </h2>
+                            <p class="text-xs text-zinc-400">Extracted merchant titles, amounts, and receipt thumbnails for audit.</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-zinc-400 font-mono">Vault Total:</span>
+                            <div id="receiptsTotalSum" class="text-base font-bold font-mono text-purple-400">$0.00</div>
+                        </div>
+                    </div>
+
+                    <div id="receiptsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto pr-1"></div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-card border-t border-zinc-800 mt-12 py-6 text-center text-xs text-zinc-400 font-mono">
+        <p>CoupleSync Budget & Technical Dashboard • Monochrome & Luxury Purple Edition</p>
+    </footer>
+
+<!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        const STORAGE_KEY = 'couples_budget_all_data_lux_v4';
+        const MONTHS_KEY = 'couples_budget_months_list_lux_v4';
+        let ghConfig = JSON.parse(localStorage.getItem('gh_config_lux')) || { user: '', repo: '', token: '' };
+
+        const blankMonthData = () => ({
+            partner1Name: "Partner 1",
+            partner1Income: 0,
+            partner2Name: "Partner 2",
+            partner2Income: 0,
+            savings: [],
+            fixedExpenses: [],
+            weeklyExpenses: [
+                { name: "Food & Groceries", w1: 0, w2: 0, w3: 0, w4: 0 },
+                { name: "Dining Out & Coffee", w1: 0, w2: 0, w3: 0, w4: 0 },
+                { name: "Transportation & Fuel", w1: 0, w2: 0, w3: 0, w4: 0 },
+                { name: "Miscellaneous & Sundries", w1: 0, w2: 0, w3: 0, w4: 0 }
+            ],
+            receipts: []
+        });
+
+        let appData = {};
+        let monthsList = ["Oct-2026", "Nov-2026", "Dec-2026"];
+        let donutChartInstance = null;
+        let trendChartInstance = null;
+        let isSwitchingMonth = false;
+        let currentActiveMonth = monthsList[0];
+
+        // Initialize App on Load
+        window.onload = function() {
+            isSwitchingMonth = true;
+            loadAllDataFromStorage();
+            currentActiveMonth = monthsList[0];
+            
+            const monthSelect = document.getElementById('activeMonth');
+            if (monthSelect) {
+                monthSelect.addEventListener('focus', () => {
+                    currentActiveMonth = monthSelect.value;
+                });
+
+                monthSelect.addEventListener('change', (e) => {
+                    const targetMonth = e.target.value;
+                    
+                    // 1. Commit current UI state to memory under the PREVIOUS tracked month key
+                    isSwitchingMonth = true;
+                    commitMonthToMemory(currentActiveMonth);
+                    
+                    // 2. Update pointer to new target month
+                    currentActiveMonth = targetMonth;
+                    
+                    // 3. Switch context and render new sheet data cleanly
+                    renderCurrentMonthUI(targetMonth);
+                    saveDataToStorageSilently();
+                    isSwitchingMonth = false;
+                    
+                    showToast(`Switched sheet view to: ${targetMonth}`, 'info');
+                });
+            }
+
+            fetchFromGitHub().then(() => {
+                renderMonthDropdown();
+                currentActiveMonth = monthsList[0];
+                renderCurrentMonthUI(currentActiveMonth);
+                isSwitchingMonth = false;
+                switchTab('dashboard');
+            });
+        };
+
+        function getActiveMonthKey() {
+            const select = document.getElementById('activeMonth');
+            return select ? select.value : currentActiveMonth;
+        }
+
+        async function fetchFromGitHub() {
+            if (!ghConfig.user || !ghConfig.repo) return;
+            try {
+                const res = await fetch(`https://raw.githubusercontent.com/${ghConfig.user}/${ghConfig.repo}/main/budget-data.json?t=${Date.now()}`);
+                if (res.ok) {
+                    const remotePayload = await res.json();
+                    if (remotePayload && remotePayload.months && remotePayload.data) {
+                        monthsList = remotePayload.months;
+                        appData = remotePayload.data;
+                        localStorage.setItem(MONTHS_KEY, JSON.stringify(monthsList));
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+                        renderMonthDropdown();
+                        currentActiveMonth = monthsList[0];
+                        renderCurrentMonthUI(currentActiveMonth);
+                        showToast("Synced latest data from GitHub!", "success");
+                    }
+                }
+            } catch (e) {
+                console.log("Using local cache storage.");
+            }
+        }
+
+        async function syncToGitHub() {
+            if (!ghConfig.user || !ghConfig.repo || !ghConfig.token) {
+                showToast("Please configure your GitHub sync settings first.", "info");
+                openSettingsModal();
+                return;
+            }
+
+            commitActiveDOMToMemory();
+            const btn = document.getElementById('syncBtn');
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i>Syncing...';
+
+            try {
+                const apiURL = `https://api.github.com/repos/${ghConfig.user}/${ghConfig.repo}/contents/budget-data.json`;
+                let sha = "";
+                const getRes = await fetch(apiURL, {
+                    headers: { "Authorization": `token ${ghConfig.token}` }
+                });
+                if (getRes.ok) {
+                    const fileMeta = await getRes.json();
+                    sha = fileMeta.sha;
+                }
+
+                const payload = { months: monthsList, data: appData };
+                const contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+                const putRes = await fetch(apiURL, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `token ${ghConfig.token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: "Auto-sync budget workbook from web app",
+                        content: contentEncoded,
+                        sha: sha ? sha : undefined
+                    })
+                });
+
+                if (putRes.ok) {
+                    showToast("Successfully synced workbook to GitHub!", "success");
+                } else {
+                    showToast("Sync failed. Check your Personal Access Token permissions.", "info");
+                }
+            } catch (err) {
+                showToast("Error connecting to GitHub API.", "info");
+            }
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-1"></i>Sync Now';
+        }
+
+        function openSettingsModal() {
+            const modal = document.getElementById('settingsModal');
+            if (modal) modal.classList.remove('hidden');
+            document.getElementById('ghUser').value = ghConfig.user;
+            document.getElementById('ghRepo').value = ghConfig.repo;
+            document.getElementById('ghToken').value = ghConfig.token;
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        function saveSettings() {
+            ghConfig.user = document.getElementById('ghUser').value.trim();
+            ghConfig.repo = document.getElementById('ghRepo').value.trim();
+            ghConfig.token = document.getElementById('ghToken').value.trim();
+            localStorage.setItem('gh_config_lux', JSON.stringify(ghConfig));
+            closeSettingsModal();
+            fetchFromGitHub();
+        }
+
+        function loadAllDataFromStorage() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            const savedMonths = localStorage.getItem(MONTHS_KEY);
+            
+            if (savedMonths) {
+                try { 
+                    const parsedMonths = JSON.parse(savedMonths);
+                    if (Array.isArray(parsedMonths) && parsedMonths.length > 0) {
+                        monthsList = parsedMonths;
+                    }
+                } catch(e) {}
+            }
+            
+            if (saved) {
+                try { 
+                    appData = JSON.parse(saved); 
+                } catch(e) { 
+                    appData = {}; 
+                }
+            }
+
+            if (monthsList.length === 0) {
+                monthsList = ["Default-Month"];
+            }
+
+            monthsList.forEach(m => {
+                if (!appData[m]) {
+                    appData[m] = blankMonthData();
+                }
+                if (!appData[m].receipts) appData[m].receipts = [];
+            });
+        }
+
+        function saveDataToStorage() {
+            commitActiveDOMToMemory();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            localStorage.setItem(MONTHS_KEY, JSON.stringify(monthsList));
+            showToast('Workbook saved locally!', 'success');
+            renderMonthDropdown();
+            calculateAll();
+        }
+
+        function saveDataToStorageSilently() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            localStorage.setItem(MONTHS_KEY, JSON.stringify(monthsList));
+        }
+
+        function renderMonthDropdown() {
+            const select = document.getElementById('activeMonth');
+            if (!select) return;
+            const currentVal = currentActiveMonth || monthsList[0];
+            select.innerHTML = '';
+            monthsList.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.textContent = m;
+                if (m === currentVal) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        /* --- ADD MONTH CRUD --- */
+        function openAddMonthModal() {
+            document.getElementById('addMonthModal').classList.remove('hidden');
+            document.getElementById('newMonthInput').value = '';
+            document.getElementById('newMonthInput').focus();
+        }
+
+        function closeAddMonthModal() {
+            document.getElementById('addMonthModal').classList.add('hidden');
+        }
+
+        function confirmAddMonth() {
+            const input = document.getElementById('newMonthInput');
+            if (!input) return;
+            const val = input.value.trim();
+            if (!val) {
+                showToast('Please enter a valid month identifier.', 'info');
+                return;
+            }
+            if (monthsList.includes(val)) {
+                showToast('Month sheet already exists!', 'info');
+                closeAddMonthModal();
+                return;
+            }
+            
+            commitActiveDOMToMemory();
+            monthsList.push(val);
+            appData[val] = blankMonthData();
+
+            saveDataToStorageSilently();
+            currentActiveMonth = val;
+            renderMonthDropdown();
+            
+            const select = document.getElementById('activeMonth');
+            if (select) select.value = val;
+            
+            renderCurrentMonthUI(val);
+            closeAddMonthModal();
+            showToast(`Created new sheet period: ${val}`, 'success');
+        }
+
+        /* --- RENAME MONTH CRUD --- */
+        function openRenameMonthModal() {
+            const oldName = currentActiveMonth;
+            if (!oldName) return;
+            document.getElementById('renameCurrentLabel').textContent = oldName;
+            const input = document.getElementById('renameMonthInput');
+            input.value = oldName;
+            document.getElementById('renameMonthModal').classList.remove('hidden');
+            input.focus();
+            input.select();
+        }
+
+        function closeRenameMonthModal() {
+            document.getElementById('renameMonthModal').classList.add('hidden');
+        }
+
+        function confirmRenameMonth() {
+            const oldName = currentActiveMonth;
+            const newName = document.getElementById('renameMonthInput').value.trim();
+            
+            if (!newName) {
+                showToast('Month name cannot be empty.', 'info');
+                return;
+            }
+            if (newName === oldName) {
+                closeRenameMonthModal();
+                return;
+            }
+            if (monthsList.includes(newName)) {
+                showToast('A month with that name already exists!', 'info');
+                return;
+            }
+
+            // 1. Commit any unsaved DOM edits into the old key first
+            commitMonthToMemory(oldName);
+
+            // 2. Replace key in monthsList preserving order
+            const idx = monthsList.indexOf(oldName);
+            if (idx !== -1) {
+                monthsList[idx] = newName;
+            }
+
+            // 3. Migrate data object & remove old key
+            appData[newName] = appData[oldName];
+            delete appData[oldName];
+
+            // 4. Update active pointer & UI
+            currentActiveMonth = newName;
+            saveDataToStorageSilently();
+            renderMonthDropdown();
+            renderCurrentMonthUI(newName);
+            closeRenameMonthModal();
+            showToast(`Renamed "${oldName}" to "${newName}"`, 'success');
+        }
+
+        /* --- DELETE MONTH CRUD --- */
+        function openDeleteMonthModal() {
+            if (monthsList.length <= 1) {
+                showToast('Cannot delete the only remaining month sheet.', 'info');
+                return;
+            }
+            document.getElementById('deleteTargetLabel').textContent = currentActiveMonth;
+            document.getElementById('deleteMonthModal').classList.remove('hidden');
+        }
+
+        function closeDeleteMonthModal() {
+            document.getElementById('deleteMonthModal').classList.add('hidden');
+        }
+
+        function confirmDeleteMonth() {
+            if (monthsList.length <= 1) {
+                closeDeleteMonthModal();
+                showToast('At least one month sheet must remain.', 'info');
+                return;
+            }
+
+            const targetToDelete = currentActiveMonth;
+            const idx = monthsList.indexOf(targetToDelete);
+
+            // 1. Remove from array and delete data dictionary entry
+            if (idx !== -1) {
+                monthsList.splice(idx, 1);
+            }
+            delete appData[targetToDelete];
+
+            // 2. Pick fallback active month (adjacent or first available)
+            const nextIndex = Math.min(idx, monthsList.length - 1);
+            const nextMonth = monthsList[nextIndex];
+            currentActiveMonth = nextMonth;
+
+            // 3. Persist and re-render UI cleanly without committing deleted DOM
+            isSwitchingMonth = true;
+            saveDataToStorageSilently();
+            renderMonthDropdown();
+            renderCurrentMonthUI(nextMonth);
+            isSwitchingMonth = false;
+
+            closeDeleteMonthModal();
+            showToast(`Deleted month sheet: ${targetToDelete}`, 'info');
+        }
+
+        // Commits DOM inputs specifically into the provided target month key
+        function commitMonthToMemory(targetMonthKey) {
+            const m = targetMonthKey || currentActiveMonth;
+            if (!m) return;
+
+            if (!appData[m]) appData[m] = blankMonthData();
+            const currentReceipts = appData[m].receipts || [];
+
+            const p1Name = document.getElementById('partner1Name');
+            const p1Inc = document.getElementById('partner1Income');
+            const p2Name = document.getElementById('partner2Name');
+            const p2Inc = document.getElementById('partner2Income');
+
+            const savingsArr = [];
+            document.querySelectorAll('.savings-row').forEach(row => {
+                const nameInp = row.querySelector('.sav-name');
+                const amtInp = row.querySelector('.sav-amt');
+                if (nameInp && amtInp) {
+                    const name = nameInp.value;
+                    const amount = parseFloat(amtInp.value) || 0;
+                    if (name.trim()) savingsArr.push({ name, amount });
+                }
+            });
+
+            const fixedArr = [];
+            document.querySelectorAll('.fixed-row').forEach(row => {
+                const nameInp = row.querySelector('.fix-name');
+                const payerInp = row.querySelector('.fix-payer');
+                const amtInp = row.querySelector('.fix-amt');
+                if (nameInp && payerInp && amtInp) {
+                    const name = nameInp.value;
+                    const payer = payerInp.value;
+                    const amount = parseFloat(amtInp.value) || 0;
+                    if (name.trim()) fixedArr.push({ name, payer, amount });
+                }
+            });
+
+            const weeklyArr = [];
+            document.querySelectorAll('.weekly-row').forEach(row => {
+                const nameInp = row.querySelector('.wk-name');
+                const w1Inp = row.querySelector('.wk-1');
+                const w2Inp = row.querySelector('.wk-2');
+                const w3Inp = row.querySelector('.wk-3');
+                const w4Inp = row.querySelector('.wk-4');
+                if (nameInp && w1Inp && w2Inp && w3Inp && w4Inp) {
+                    const name = nameInp.value;
+                    const w1 = parseFloat(w1Inp.value) || 0;
+                    const w2 = parseFloat(w2Inp.value) || 0;
+                    const w3 = parseFloat(w3Inp.value) || 0;
+                    const w4 = parseFloat(w4Inp.value) || 0;
+                    if (name.trim()) weeklyArr.push({ name, w1, w2, w3, w4 });
+                }
+            });
+
+            appData[m] = {
+                partner1Name: p1Name ? (p1Name.value || "Partner 1") : "Partner 1",
+                partner1Income: p1Inc ? (parseFloat(p1Inc.value) || 0) : 0,
+                partner2Name: p2Name ? (p2Name.value || "Partner 2") : "Partner 2",
+                partner2Income: p2Inc ? (parseFloat(p2Inc.value) || 0) : 0,
+                savings: savingsArr,
+                fixedExpenses: fixedArr,
+                weeklyExpenses: weeklyArr,
+                receipts: currentReceipts
+            };
+        }
+
+        function commitActiveDOMToMemory() {
+            commitMonthToMemory(currentActiveMonth);
+        }
+
+        // Renders the UI specifically for the requested target month sheet
+        function renderCurrentMonthUI(targetMonth) {
+            isSwitchingMonth = true;
+            const m = targetMonth || currentActiveMonth;
+            
+            if (!appData[m]) {
+                appData[m] = blankMonthData();
+            }
+            const data = appData[m];
+
+            if (document.getElementById('partner1Name')) document.getElementById('partner1Name').value = data.partner1Name;
+            if (document.getElementById('partner1Income')) document.getElementById('partner1Income').value = data.partner1Income;
+            if (document.getElementById('partner2Name')) document.getElementById('partner2Name').value = data.partner2Name;
+            if (document.getElementById('partner2Income')) document.getElementById('partner2Income').value = data.partner2Income;
+
+            const savContainer = document.getElementById('savingsRowsContainer');
+            if (savContainer) {
+                savContainer.innerHTML = '';
+                if (!data.savings || data.savings.length === 0) {
+                    savContainer.innerHTML = '<p class="text-xs text-zinc-500 italic py-2 empty-placeholder">No savings goals added for this period.</p>';
+                } else {
+                    data.savings.forEach(s => savContainer.appendChild(createSavingsElement(s.name, s.amount)));
+                }
+            }
+
+            const fixContainer = document.getElementById('fixedRowsContainer');
+            if (fixContainer) {
+                fixContainer.innerHTML = '';
+                if (!data.fixedExpenses || data.fixedExpenses.length === 0) {
+                    fixContainer.innerHTML = '<tr class="empty-placeholder"><td colspan="4" class="py-4 text-center text-xs text-zinc-500 italic">No fixed expenses recorded for this period.</td></tr>';
+                } else {
+                    data.fixedExpenses.forEach(f => fixContainer.appendChild(createFixedElement(f.name, f.payer, f.amount)));
+                }
+            }
+
+            const wkContainer = document.getElementById('weeklyRowsContainer');
+            if (wkContainer) {
+                wkContainer.innerHTML = '';
+                if (!data.weeklyExpenses || data.weeklyExpenses.length === 0) {
+                    wkContainer.innerHTML = '<tr class="empty-placeholder"><td colspan="7" class="py-4 text-center text-xs text-zinc-500 italic">No weekly variable expenses recorded for this period.</td></tr>';
+                } else {
+                    data.weeklyExpenses.forEach(w => wkContainer.appendChild(createWeeklyElement(w.name, w.w1, w.w2, w.w3, w.w4)));
+                }
+            }
+
+            renderReceiptsVault();
+            isSwitchingMonth = false;
+            calculateAll();
+        }
+
+        function createSavingsElement(name, amount) {
+            const div = document.createElement('div');
+            div.className = "savings-row flex items-center space-x-3 bg-zinc-900/80 p-3 rounded-xl border border-zinc-800";
+            div.innerHTML = `
+                <input type="text" value="${name}" placeholder="Goal Name" class="sav-name flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-zinc-100 focus:outline-none" oninput="calculateAll()">
+                <div class="relative w-36">
+                    <span class="absolute left-3 top-2 text-xs text-zinc-400 font-mono">$</span>
+                    <input type="number" value="${amount}" placeholder="0.00" class="sav-amt w-full bg-zinc-900 border border-zinc-700 rounded-lg pl-7 pr-3 py-2 text-xs font-mono text-purple-300 font-semibold focus:outline-none" oninput="calculateAll()">
+                </div>
+                <button type="button" onclick="this.closest('.savings-row').remove(); calculateAll();" class="text-zinc-500 hover:text-rose-400 p-2 transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+            `;
+            return div;
+        }
+
+        function createFixedElement(name, payer, amount) {
+            const tr = document.createElement('tr');
+            tr.className = "fixed-row hover:bg-zinc-900/40 transition";
+            tr.innerHTML = `
+                <td class="py-3 px-4">
+                    <input type="text" value="${name}" placeholder="Expense description" class="fix-name w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-100 focus:outline-none" oninput="calculateAll()">
+                </td>
+                <td class="py-3 px-4">
+                    <select class="fix-payer bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-300 focus:outline-none" onchange="calculateAll()">
+                        <option value="Split 50/50" ${payer==='Split 50/50'?'selected':''}>Split 50/50</option>
+                        <option value="Partner 1" ${payer==='Partner 1'?'selected':''}>Partner 1</option>
+                        <option value="Partner 2" ${payer==='Partner 2'?'selected':''}>Partner 2</option>
+                        <option value="Joint Account" ${payer==='Joint Account'?'selected':''}>Joint Account</option>
+                    </select>
+                </td>
+                <td class="py-3 px-4">
+                    <div class="relative">
+                        <span class="absolute left-3 top-2 text-xs text-zinc-400 font-mono">$</span>
+                        <input type="number" value="${amount}" placeholder="0.00" class="fix-amt w-full bg-zinc-900 border border-rose-950 rounded-xl pl-7 pr-3 py-2 text-xs font-mono text-rose-400 font-semibold focus:outline-none bg-rose-950/10" oninput="calculateAll()">
+                    </div>
+                </td>
+                <td class="py-3 px-4 text-center">
+                    <button type="button" onclick="this.closest('tr').remove(); calculateAll();" class="text-zinc-500 hover:text-rose-400 p-2 transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                </td>
+            `;
+            return tr;
+        }
+
+        function createWeeklyElement(name, w1, w2, w3, w4) {
+            const tr = document.createElement('tr');
+            tr.className = "weekly-row hover:bg-zinc-900/40 transition";
+            tr.innerHTML = `
+                <td class="py-3 px-4">
+                    <input type="text" value="${name}" placeholder="Category" class="wk-name w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-100 focus:outline-none" oninput="calculateAll()">
+                </td>
+                <td class="py-3 px-4"><input type="number" value="${w1}" class="wk-1 w-full bg-zinc-900 border border-rose-950 rounded-xl px-3 py-2 text-xs font-mono text-rose-300 bg-rose-950/10 focus:outline-none" oninput="calculateAll()"></td>
+                <td class="py-3 px-4"><input type="number" value="${w2}" class="wk-2 w-full bg-zinc-900 border border-rose-950 rounded-xl px-3 py-2 text-xs font-mono text-rose-300 bg-rose-950/10 focus:outline-none" oninput="calculateAll()"></td>
+                <td class="py-3 px-4"><input type="number" value="${w3}" class="wk-3 w-full bg-zinc-900 border border-rose-950 rounded-xl px-3 py-2 text-xs font-mono text-rose-300 bg-rose-950/10 focus:outline-none" oninput="calculateAll()"></td>
+                <td class="py-3 px-4"><input type="number" value="${w4}" class="wk-4 w-full bg-zinc-900 border border-rose-950 rounded-xl px-3 py-2 text-xs font-mono text-rose-300 bg-rose-950/10 focus:outline-none" oninput="calculateAll()"></td>
+                <td class="py-3 px-4 text-right font-mono font-bold text-rose-400 row-weekly-total">$0.00</td>
+                <td class="py-3 px-4 text-center">
+                    <button type="button" onclick="this.closest('tr').remove(); calculateAll();" class="text-zinc-500 hover:text-rose-400 p-2 transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                </td>
+            `;
+            return tr;
+        }
+
+        async function processBatchReceiptsOCR(input) {
+            if (!input.files || input.files.length === 0) return;
+            const files = Array.from(input.files);
+            const statusEl = document.getElementById('ocrBatchStatus');
+            const statusText = document.getElementById('ocrBatchStatusText');
+            if (statusEl) statusEl.classList.remove('hidden');
+            
+            const defCategoryEl = document.getElementById('batchDefaultCategory');
+            const defAssignmentEl = document.getElementById('batchDefaultAssignment');
+            const monthKey = currentActiveMonth;
+
+            const defCategory = defCategoryEl ? defCategoryEl.value : 'Miscellaneous & Sundries';
+            const defAssignment = defAssignmentEl ? defAssignmentEl.value : 'Miscellaneous Vault Only';
+
+            let processedCount = 0;
+
+            for (const file of files) {
+                if (statusText) statusText.innerText = `Processing receipt ${processedCount + 1} of ${files.length} via OCR...`;
+                
+                try {
+                    const dataUrl = await readFileAsDataURL(file);
+                    const ocrResult = await Tesseract.recognize(dataUrl, 'eng');
+                    const rawText = ocrResult.data.text;
+
+                    const parsed = parseReceiptText(rawText, file.name);
+
+                    const newReceipt = {
+                        id: 'rcpt_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+                        title: parsed.title,
+                        amount: parsed.amount,
+                        date: parsed.date,
+                        category: defCategory,
+                        assignment: defAssignment,
+                        photo: dataUrl
+                    };
+
+                    if (!appData[monthKey].receipts) appData[monthKey].receipts = [];
+                    appData[monthKey].receipts.push(newReceipt);
+                    syncReceiptToExpenses(newReceipt);
+
+                } catch(err) {
+                    const dataUrl = await readFileAsDataURL(file);
+                    const fallbackReceipt = {
+                        id: 'rcpt_' + Date.now(),
+                        title: file.name.replace(/\.[^/.]+$/, ""),
+                        amount: 0.00,
+                        date: new Date().toLocaleDateString(),
+                        category: defCategory,
+                        assignment: defAssignment,
+                        photo: dataUrl
+                    };
+                    if (!appData[monthKey].receipts) appData[monthKey].receipts = [];
+                    appData[monthKey].receipts.push(fallbackReceipt);
+                }
+
+                processedCount++;
+            }
+
+            if (statusEl) statusEl.classList.add('hidden');
+            input.value = '';
+            renderReceiptsVault();
+            calculateAll();
+            showToast(`Successfully processed ${processedCount} receipts!`, 'success');
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function parseReceiptText(text, filename) {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 1);
+            let title = filename.replace(/\.[^/.]+$/, "");
+            for (let line of lines) {
+                if (line.length > 3 && !/^\d+[\/\-\.]\d+/.test(line) && !/total|subtotal|tax|cash|change/i.test(line)) {
+                    title = line.substring(0, 35);
+                    break;
+                }
+            }
+
+            let amount = 0.00;
+            const totalMatchRegex = /(?:total|balance|amount|due|sum)[\s:]*\$?(\d+\.\d{2})/gi;
+            let foundAmounts = [];
+
+            let match;
+            while ((match = totalMatchRegex.exec(text)) !== null) {
+                foundAmounts.push(parseFloat(match[1]));
+            }
+
+            if (foundAmounts.length > 0) {
+                amount = Math.max(...foundAmounts);
+            } else {
+                const allDecimals = text.match(/\d+\.\d{2}/g);
+                if (allDecimals && allDecimals.length > 0) {
+                    const numbers = allDecimals.map(Number).filter(n => n < 5000);
+                    if (numbers.length > 0) amount = Math.max(...numbers);
+                }
+            }
+
+            let dateStr = new Date().toLocaleDateString();
+            const dateRegex = /\b(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4})\b/;
+            const dateMatch = text.match(dateRegex);
+            if (dateMatch) dateStr = dateMatch[1];
+
+            return { title, amount, date: dateStr };
+        }
+
+        function updateReceiptField(id, field, val) {
+            const m = currentActiveMonth;
+            if (!appData[m] || !appData[m].receipts) return;
+            const receipt = appData[m].receipts.find(r => r.id === id);
+            if (receipt) {
+                if (field === 'amount') receipt.amount = parseFloat(val) || 0;
+                else if (field === 'title') receipt.title = val;
+                else if (field === 'category') receipt.category = val;
+                else if (field === 'assignment') {
+                    receipt.assignment = val;
+                    syncReceiptToExpenses(receipt);
+                }
+                calculateAll();
+            }
+        }
+
+        function syncReceiptToExpenses(receipt) {
+            if (receipt.assignment.startsWith('Week ')) {
+                const weekNum = receipt.assignment.replace('Week ', '');
+                const weeklyRows = document.querySelectorAll('.weekly-row');
+                let matched = false;
+
+                weeklyRows.forEach(row => {
+                    const nameInput = row.querySelector('.wk-name');
+                    if (nameInput && (nameInput.value.toLowerCase().includes(receipt.category.toLowerCase()) || 
+                        (receipt.category === 'Miscellaneous & Sundries' && nameInput.value.toLowerCase().includes('misc')))) {
+                        const targetWeekInput = row.querySelector(`.wk-${weekNum}`);
+                        if (targetWeekInput) {
+                            targetWeekInput.value = (parseFloat(targetWeekInput.value || 0) + receipt.amount).toFixed(2);
+                            matched = true;
+                        }
+                    }
+                });
+
+                if (!matched && weeklyRows.length > 0) {
+                    const lastRowInput = weeklyRows[weeklyRows.length - 1].querySelector(`.wk-${weekNum}`);
+                    if (lastRowInput) {
+                        lastRowInput.value = (parseFloat(lastRowInput.value || 0) + receipt.amount).toFixed(2);
+                    }
+                }
+            } else if (receipt.assignment === 'Whole Month Lump-Sum') {
+                const fixedContainer = document.getElementById('fixedRowsContainer');
+                if (fixedContainer) {
+                    const placeholder = fixedContainer.querySelector('.empty-placeholder');
+                    if (placeholder) placeholder.remove();
+                    fixedContainer.appendChild(createFixedElement(`${receipt.title} (${receipt.category})`, 'Joint Account', receipt.amount));
+                }
+            }
+        }
+
+        function deleteReceipt(id) {
+            const m = currentActiveMonth;
+            if (appData[m] && appData[m].receipts) {
+                appData[m].receipts = appData[m].receipts.filter(r => r.id !== id);
+                renderReceiptsVault();
+                calculateAll();
+                showToast('Receipt deleted', 'info');
+            }
+        }
+
+        function renderReceiptsVault() {
+            const m = currentActiveMonth;
+            const grid = document.getElementById('receiptsGrid');
+            if (!grid) return;
+            const receipts = (appData[m] && appData[m].receipts) ? appData[m].receipts : [];
+
+            grid.innerHTML = '';
+            let totalSum = 0;
+
+            if (receipts.length === 0) {
+                grid.innerHTML = `
+                    <div class="sm:col-span-2 text-center py-12 text-zinc-500">
+                        <i class="fa-solid fa-receipt text-3xl mb-2 opacity-40"></i>
+                        <p class="text-xs">No uploaded receipt images for ${m}.</p>
+                    </div>
+                `;
+            } else {
+                receipts.forEach(r => {
+                    totalSum += r.amount;
+                    const card = document.createElement('div');
+                    card.className = "bg-zinc-900/90 border border-zinc-800 rounded-xl p-3 flex flex-col space-y-3";
+                    card.innerHTML = `
+                        <div class="flex items-start space-x-3">
+                            <img src="${r.photo}" alt="${r.title}" class="w-16 h-16 object-cover rounded-lg border border-zinc-700 bg-zinc-950 flex-shrink-0 cursor-pointer" onclick="window.open('${r.photo}')" title="Click to view full image">
+                            <div class="flex-1 min-w-0 space-y-2">
+                                <input type="text" value="${r.title}" oninput="updateReceiptField('${r.id}', 'title', this.value)" class="w-full bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-xs font-bold text-white focus:outline-none">
+                                <div class="flex items-center space-x-2">
+                                    <select onchange="updateReceiptField('${r.id}', 'category', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2 py-0.5 text-[10px] text-zinc-300">
+                                        <option value="Food & Groceries" ${r.category==='Food & Groceries'?'selected':''}>Groceries</option>
+                                        <option value="Dining Out & Coffee" ${r.category==='Dining Out & Coffee'?'selected':''}>Dining</option>
+                                        <option value="Transportation & Fuel" ${r.category==='Transportation & Fuel'?'selected':''}>Transport</option>
+                                        <option value="Miscellaneous & Sundries" ${r.category==='Miscellaneous & Sundries'?'selected':''}>Misc</option>
+                                    </select>
+                                    <select onchange="updateReceiptField('${r.id}', 'assignment', this.value)" class="bg-zinc-950 border border-zinc-800 rounded px-2 py-0.5 text-[10px] text-purple-300">
+                                        <option value="Week 1" ${r.assignment==='Week 1'?'selected':''}>Week 1</option>
+                                        <option value="Week 2" ${r.assignment==='Week 2'?'selected':''}>Week 2</option>
+                                        <option value="Week 3" ${r.assignment==='Week 3'?'selected':''}>Week 3</option>
+                                        <option value="Week 4" ${r.assignment==='Week 4'?'selected':''}>Week 4</option>
+                                        <option value="Whole Month Lump-Sum" ${r.assignment==='Whole Month Lump-Sum'?'selected':''}>Fixed Sum</option>
+                                        <option value="Miscellaneous Vault Only" ${r.assignment==='Miscellaneous Vault Only'?'selected':''}>Vault Only</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-zinc-800/80 pt-2">
+                            <div class="relative w-32">
+                                <span class="absolute left-2 top-1 text-xs text-zinc-400 font-mono">$</span>
+                                <input type="number" step="0.01" value="${r.amount.toFixed(2)}" oninput="updateReceiptField('${r.id}', 'amount', this.value)" class="w-full bg-zinc-950 border border-zinc-800 rounded pl-6 pr-2 py-1 text-xs font-mono font-bold text-rose-400 focus:outline-none">
+                            </div>
+                            <button type="button" onclick="deleteReceipt('${r.id}')" class="text-zinc-500 hover:text-rose-400 text-xs transition px-2 py-1"><i class="fa-solid fa-trash-can mr-1"></i>Delete</button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+            const receiptsSumEl = document.getElementById('receiptsTotalSum');
+            if (receiptsSumEl) receiptsSumEl.innerText = `$${totalSum.toFixed(2)}`;
+        }
+
+        function exportToExcel() {
+            commitActiveDOMToMemory();
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "COUPLE LUXURY PURPLE BUDGET & TECHNICAL WORKBOOK REPORT\n";
+            csvContent += `Export Date: ${new Date().toLocaleDateString()}\n\n`;
+
+            monthsList.forEach(mKey => {
+                const mData = appData[mKey];
+                csvContent += `=========================================\n`;
+                csvContent += `SHEET MONTH: ${mKey}\n`;
+                csvContent += `=========================================\n\n`;
+
+                if (!mData) {
+                    csvContent += "Status: Blank / No Data\n\n";
+                    return;
+                }
+
+                const inc1 = mData.partner1Income || 0;
+                const inc2 = mData.partner2Income || 0;
+                const totalInc = inc1 + inc2;
+                csvContent += "INCOME & EARNINGS\n";
+                csvContent += `Partner, Name, Monthly Earning ($)\n`;
+                csvContent += `Partner 1, "${mData.partner1Name}", ${inc1}\n`;
+                csvContent += `Partner 2, "${mData.partner2Name}", ${inc2}\n`;
+                csvContent += `TOTAL MONTHLY INCOME,, ${totalInc}\n\n`;
+
+                csvContent += "SAVINGS & INVESTMENTS\n";
+                csvContent += "Goal Name, Amount ($)\n";
+                let totSav = 0;
+                (mData.savings || []).forEach(s => {
+                    csvContent += `"${s.name}", ${s.amount}\n`;
+                    totSav += s.amount;
+                });
+                csvContent += `TOTAL SAVINGS,, ${totSav}\n\n`;
+
+                csvContent += "FIXED MONTHLY EXPENSES\n";
+                csvContent += "Description, Assigned Payer, Amount ($)\n";
+                let totFix = 0;
+                (mData.fixedExpenses || []).forEach(f => {
+                    csvContent += `"${f.name}", "${f.payer}", ${f.amount}\n`;
+                    totFix += f.amount;
+                });
+                csvContent += `TOTAL FIXED EXPENSES,, ${totFix}\n\n`;
+
+                csvContent += "WEEKLY VARIABLE SPENDING\n";
+                csvContent += "Category, Week 1 ($), Week 2 ($), Week 3 ($), Week 4 ($), Total ($)\n";
+                let totWk = 0;
+                (mData.weeklyExpenses || []).forEach(w => {
+                    const rowTot = w.w1 + w.w2 + w.w3 + w.w4;
+                    csvContent += `"${w.name}", ${w.w1}, ${w.w2}, ${w.w3}, ${w.w4}, ${rowTot}\n`;
+                    totWk += rowTot;
+                });
+                csvContent += `TOTAL WEEKLY VARIABLE SPEND,,,, ${totWk}\n\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Couple_Lux_Workbook_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('Workbook CSV exported successfully!', 'success');
+        }
+
+        function addSavingsRow() {
+            const container = document.getElementById('savingsRowsContainer');
+            if (container) {
+                const placeholder = container.querySelector('.empty-placeholder');
+                if (placeholder) placeholder.remove();
+                container.appendChild(createSavingsElement("New Goal", 200));
+            }
+            calculateAll();
+        }
+
+        function addFixedRow() {
+            const container = document.getElementById('fixedRowsContainer');
+            if (container) {
+                const placeholder = container.querySelector('.empty-placeholder');
+                if (placeholder) placeholder.remove();
+                container.appendChild(createFixedElement("New Expense", "Split 50/50", 100));
+            }
+            calculateAll();
+        }
+
+        function addWeeklyRow() {
+            const container = document.getElementById('weeklyRowsContainer');
+            if (container) {
+                const placeholder = container.querySelector('.empty-placeholder');
+                if (placeholder) placeholder.remove();
+                container.appendChild(createWeeklyElement("New Category", 50, 50, 50, 50));
+            }
+            calculateAll();
+        }
+
+        function calculateAll() {
+            if (isSwitchingMonth) return;
+
+            const p1IncEl = document.getElementById('partner1Income');
+            const p2IncEl = document.getElementById('partner2Income');
+            const p1Inc = p1IncEl ? (parseFloat(p1IncEl.value) || 0) : 0;
+            const p2Inc = p2IncEl ? (parseFloat(p2IncEl.value) || 0) : 0;
+            const totalIncome = p1Inc + p2Inc;
+
+            let totalSavings = 0;
+            document.querySelectorAll('.savings-row').forEach(row => {
+                const amtInp = row.querySelector('.sav-amt');
+                if (amtInp) totalSavings += parseFloat(amtInp.value) || 0;
+            });
+
+            let totalFixed = 0;
+            document.querySelectorAll('.fixed-row').forEach(row => {
+                const amtInp = row.querySelector('.fix-amt');
+                if (amtInp) totalFixed += parseFloat(amtInp.value) || 0;
+            });
+
+            let w1Tot = 0, w2Tot = 0, w3Tot = 0, w4Tot = 0, totalWeekly = 0;
+            document.querySelectorAll('.weekly-row').forEach(row => {
+                const w1Inp = row.querySelector('.wk-1');
+                const w2Inp = row.querySelector('.wk-2');
+                const w3Inp = row.querySelector('.wk-3');
+                const w4Inp = row.querySelector('.wk-4');
+                const rowTotEl = row.querySelector('.row-weekly-total');
+
+                const v1 = w1Inp ? (parseFloat(w1Inp.value) || 0) : 0;
+                const v2 = w2Inp ? (parseFloat(w2Inp.value) || 0) : 0;
+                const v3 = w3Inp ? (parseFloat(w3Inp.value) || 0) : 0;
+                const v4 = w4Inp ? (parseFloat(w4Inp.value) || 0) : 0;
+                const rowTot = v1 + v2 + v3 + v4;
+
+                if (rowTotEl) rowTotEl.innerText = `$${rowTot.toFixed(2)}`;
+                w1Tot += v1; w2Tot += v2; w3Tot += v3; w4Tot += v4;
+                totalWeekly += rowTot;
+            });
+
+            if (document.getElementById('subWeek1')) document.getElementById('subWeek1').innerText = `$${w1Tot.toFixed(2)}`;
+            if (document.getElementById('subWeek2')) document.getElementById('subWeek2').innerText = `$${w2Tot.toFixed(2)}`;
+            if (document.getElementById('subWeek3')) document.getElementById('subWeek3').innerText = `$${w3Tot.toFixed(2)}`;
+            if (document.getElementById('subWeek4')) document.getElementById('subWeek4').innerText = `$${w4Tot.toFixed(2)}`;
+            if (document.getElementById('grandWeeklyTotal')) document.getElementById('grandWeeklyTotal').innerText = `$${totalWeekly.toFixed(2)}`;
+
+            const totalExpenses = totalFixed + totalWeekly;
+            const netRemaining = totalIncome - (totalExpenses + totalSavings);
+            const savingsRate = totalIncome > 0 ? (totalSavings / totalIncome) * 100 : 0;
+            const expenseRatio = totalIncome > 0 ? (totalExpenses / totalIncome) * 100 : 0;
+            const weeklyBurnRate = totalWeekly / 4;
+
+            if (document.getElementById('displayTotalIncome')) document.getElementById('displayTotalIncome').innerText = `$${totalIncome.toFixed(2)}`;
+            if (document.getElementById('displayTotalSavings')) document.getElementById('displayTotalSavings').innerText = `$${totalSavings.toFixed(2)}`;
+            if (document.getElementById('displayTotalFixed')) document.getElementById('displayTotalFixed').innerText = `$${totalFixed.toFixed(2)}`;
+            if (document.getElementById('displayTotalWeekly')) document.getElementById('displayTotalWeekly').innerText = `$${totalWeekly.toFixed(2)}`;
+
+            if (document.getElementById('kpi-income')) document.getElementById('kpi-income').innerText = `$${totalIncome.toFixed(2)}`;
+            if (document.getElementById('kpi-expenses')) document.getElementById('kpi-expenses').innerText = `$${totalExpenses.toFixed(2)}`;
+            if (document.getElementById('kpi-savings')) document.getElementById('kpi-savings').innerText = `$${totalSavings.toFixed(2)}`;
+            if (document.getElementById('kpi-net')) document.getElementById('kpi-net').innerText = `$${netRemaining.toFixed(2)}`;
+            if (document.getElementById('kpi-savings-rate')) document.getElementById('kpi-savings-rate').innerText = `${savingsRate.toFixed(1)}%`;
+
+            if (document.getElementById('metric-expense-ratio')) document.getElementById('metric-expense-ratio').innerText = `${expenseRatio.toFixed(1)}%`;
+            if (document.getElementById('metric-weekly-burn')) document.getElementById('metric-weekly-burn').innerText = `$${weeklyBurnRate.toFixed(2)}/wk`;
+            
+            const savingsStatusEl = document.getElementById('metric-savings-status');
+            if (savingsStatusEl) {
+                if (savingsRate >= 20) {
+                    savingsStatusEl.innerText = "Excellent (≥20%)";
+                    savingsStatusEl.className = "text-xl font-bold font-mono text-emerald-400";
+                } else if (savingsRate >= 10) {
+                    savingsStatusEl.innerText = "Good (≥10%)";
+                    savingsStatusEl.className = "text-xl font-bold font-mono text-purple-300";
+                } else {
+                    savingsStatusEl.innerText = "Below Target (<10%)";
+                    savingsStatusEl.className = "text-xl font-bold font-mono text-amber-400";
+                }
+            }
+
+            commitActiveDOMToMemory();
+            saveDataToStorageSilently();
+            renderCharts(totalFixed, totalWeekly, totalSavings, Math.max(0, netRemaining));
+            renderMultiMonthSummaryTable();
+        }
+
+        function getMonthMetrics(monthKey) {
+            const mData = appData[monthKey];
+            if (!mData || (mData.partner1Income === 0 && mData.partner2Income === 0 && mData.fixedExpenses.length === 0 && mData.savings.length === 0)) {
+                return { isBlank: true, income: 0, fixed: 0, weekly: 0, savings: 0, net: 0, savingsRate: 0, expenseRatio: 0 };
+            }
+            const income = mData.partner1Income + mData.partner2Income;
+            const fixed = mData.fixedExpenses.reduce((acc, curr) => acc + curr.amount, 0);
+            const weekly = mData.weeklyExpenses.reduce((acc, curr) => acc + (curr.w1 + curr.w2 + curr.w3 + curr.w4), 0);
+            const savings = mData.savings.reduce((acc, curr) => acc + curr.amount, 0);
+            const expenses = fixed + weekly;
+            const net = income - (expenses + savings);
+            const savingsRate = income > 0 ? (savings / income) * 100 : 0;
+            const expenseRatio = income > 0 ? (expenses / income) * 100 : 0;
+
+            return { isBlank: false, income, fixed, weekly, savings, net, expenses, savingsRate, expenseRatio };
+        }
+
+        function renderMultiMonthSummaryTable() {
+            const thead = document.getElementById('multiMonthTableHead');
+            const tbody = document.getElementById('multiMonthTableBody');
+            if (!thead || !tbody) return;
+
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            let headerHTML = `<tr class="border-b border-zinc-800 text-xs text-zinc-400 uppercase bg-zinc-900/60 font-mono"><th class="py-3 px-6">Workbook Metric</th>`;
+            monthsList.forEach(m => { headerHTML += `<th class="py-3 px-6">${m}</th>`; });
+            headerHTML += `<th class="py-3 px-6 text-right">Total / Avg</th></tr>`;
+            thead.innerHTML = headerHTML;
+
+            const allMetrics = monthsList.map(m => getMonthMetrics(m));
+            const validMonths = allMetrics.filter(x => !x.isBlank);
+            const count = validMonths.length || 1;
+
+            const avgIncome = validMonths.reduce((a, b) => a + b.income, 0) / count;
+            const totalFixedSum = validMonths.reduce((a, b) => a + b.fixed, 0);
+            const totalWeeklySum = validMonths.reduce((a, b) => a + b.weekly, 0);
+            const totalSavingsSum = validMonths.reduce((a, b) => a + b.savings, 0);
+            const avgSavingsRate = validMonths.reduce((a, b) => a + b.savingsRate, 0) / count;
+            const avgExpenseRatio = validMonths.reduce((a, b) => a + b.expenseRatio, 0) / count;
+
+            const rowsDef = [
+                { label: "Total Combined Income", getVal: m => m.income, isPercent: false, isRed: false },
+                { label: "Fixed Monthly Expenses", getVal: m => m.fixed, isPercent: false, isRed: true },
+                { label: "Weekly Variable Spending", getVal: m => m.weekly, isPercent: false, isRed: true },
+                { label: "Total Savings Allocated", getVal: m => m.savings, isPercent: false, isRed: false },
+                { label: "Net Remaining Cash Flow", getVal: m => m.net, isPercent: false, isRed: false },
+                { label: "Savings Rate (%)", getVal: m => m.savingsRate, isPercent: true, isRed: false },
+                { label: "Expense-to-Income Ratio (%)", getVal: m => m.expenseRatio, isPercent: true, isRed: true }
+            ];
+
+            rowsDef.forEach((rd, rIdx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-zinc-900/40 transition";
+                let rowHTML = `<td class="py-3 px-6 font-medium text-zinc-300">${rd.label}</td>`;
+
+                allMetrics.forEach(mObj => {
+                    if (mObj.isBlank) {
+                        rowHTML += `<td class="py-3 px-6 font-mono text-zinc-500 font-medium">$0.00</td>`;
+                    } else {
+                        const val = rd.getVal(mObj);
+                        const cellColor = rd.isRed ? 'text-rose-400 bg-rose-950/10 font-mono' : 'text-zinc-200 font-mono';
+                        const fmt = rd.isPercent ? `${val.toFixed(1)}%` : `$${val.toFixed(2)}`;
+                        rowHTML += `<td class="py-3 px-6 ${cellColor}">${fmt}</td>`;
+                    }
+                });
+
+                let summaryVal = 0;
+                if (rIdx === 0) summaryVal = avgIncome;
+                else if (rIdx === 1) summaryVal = totalFixedSum;
+                else if (rIdx === 2) summaryVal = totalWeeklySum;
+                else if (rIdx === 3) summaryVal = totalSavingsSum;
+                else if (rIdx === 4) summaryVal = avgIncome - ((totalFixedSum + totalWeeklySum + totalSavingsSum) / count);
+                else if (rIdx === 5) summaryVal = avgSavingsRate;
+                else if (rIdx === 6) summaryVal = avgExpenseRatio;
+
+                const summaryFmt = rd.isPercent ? `${summaryVal.toFixed(1)}%` : `$${summaryVal.toFixed(2)}`;
+                rowHTML += `<td class="py-3 px-6 text-right font-bold font-mono ${rd.isRed ? 'text-rose-400 bg-rose-950/20' : 'text-purple-400'}">${summaryFmt}</td>`;
+
+                tr.innerHTML = rowHTML;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderCharts(fixed, weekly, savings, netRemaining) {
+            const canvasDonut = document.getElementById('budgetDonutChart');
+            if (canvasDonut) {
+                const ctxDonut = canvasDonut.getContext('2d');
+                if (donutChartInstance) donutChartInstance.destroy();
+
+                donutChartInstance = new Chart(ctxDonut, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Fixed Expenses', 'Weekly Variable', 'Savings & Investments', 'Net Remaining'],
+                        datasets: [{
+                            data: [fixed, weekly, savings, netRemaining],
+                            backgroundColor: ['#f43f5e', '#fb923c', '#8b5cf6', '#c084fc'],
+                            borderWidth: 2,
+                            borderColor: '#141418'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: '#d4d4d8', font: { family: 'Inter', size: 11 } } }
+                        },
+                        cutout: '72%'
+                    }
+                });
+            }
+
+            const canvasTrend = document.getElementById('trendBarChart');
+            if (canvasTrend) {
+                const allMetrics = monthsList.map(m => getMonthMetrics(m));
+                const ctxTrend = canvasTrend.getContext('2d');
+                if (trendChartInstance) trendChartInstance.destroy();
+
+                trendChartInstance = new Chart(ctxTrend, {
+                    type: 'bar',
+                    data: {
+                        labels: monthsList,
+                        datasets: [
+                            { label: 'Income', data: allMetrics.map(m => m.isBlank ? 0 : m.income), backgroundColor: '#10b981', borderRadius: 6 },
+                            { label: 'Expenses', data: allMetrics.map(m => m.isBlank ? 0 : m.expenses), backgroundColor: '#f43f5e', borderRadius: 6 },
+                            { label: 'Savings', data: allMetrics.map(m => m.isBlank ? 0 : m.savings), backgroundColor: '#8b5cf6', borderRadius: 6 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: '#a1a1aa', font: { family: 'JetBrains Mono', size: 10 } } },
+                            y: { grid: { color: '#27272a' }, ticks: { color: '#a1a1aa', font: { family: 'JetBrains Mono', size: 10 } } }
+                        },
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: '#d4d4d8', font: { family: 'Inter', size: 11 } } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function switchTab(tabId) {
+            ['dashboard', 'income', 'fixed', 'weekly', 'receipts'].forEach(t => {
+                const tabEl = document.getElementById(`tab-${t}`);
+                if (tabEl) tabEl.classList.add('hidden');
+                const btn = document.getElementById(`tab-btn-${t}`);
+                if (btn) btn.className = "py-3 px-1 border-b-2 font-medium text-sm transition border-transparent text-zinc-400 hover:text-zinc-200 flex items-center space-x-2";
+            });
+
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            if (targetTab) targetTab.classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            if (activeBtn) activeBtn.className = "py-3 px-1 border-b-2 font-medium text-sm transition border-purple-400 text-purple-300 flex items-center space-x-2";
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+            if (!toast || !toastMsg || !toastIcon) return;
+
+            toastMsg.innerText = msg;
+            if (type === 'success') {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-check text-purple-400"></i>';
+            } else {
+                toastIcon.innerHTML = '<i class="fa-solid fa-circle-info text-purple-300"></i>';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+
+</body>
+</html>
